@@ -1,0 +1,7 @@
+numpy>=1.24
+scikit-learn>=1.3
+# Optional: enables real pretrained BERT tokenizer and sentence-transformer embeddings.
+# Without these, the code runs in a clearly labelled offline fallback mode.
+transformers>=4.40
+sentence-transformers>=2.7
+torch>=2.1

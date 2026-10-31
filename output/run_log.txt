@@ -1,0 +1,153 @@
+
+======================================================================
+1. Machine Learning - Text Classification
+======================================================================
+Training samples: 28, test samples: 12
+Vocabulary size: 79
+
+Held-out test accuracy: 0.67 (single 70/30 split, 12 samples)
+5-fold cross-validation accuracy: 0.97 (folds: 1.00, 1.00, 0.88, 1.00, 1.00)
+
+Classification report:
+              precision    recall  f1-score   support
+
+    negative       0.67      0.67      0.67         6
+    positive       0.67      0.67      0.67         6
+
+    accuracy                           0.67        12
+   macro avg       0.67      0.67      0.67        12
+weighted avg       0.67      0.67      0.67        12
+
+Predictions for new text (inference only):
+  'The service was great and the room was lovely'
+    -> positive (confidence 0.67)
+  'This was a terrible meal and the staff were awful'
+    -> negative (confidence 0.64)
+  'The movie was okay but a bit slow'
+    -> negative (confidence 0.55)
+
+Training vs inference:
+- Training fits the vectoriser and model parameters on labelled data (fit).
+- Inference applies the already-trained objects to new data (transform/predict).
+- Inference never updates the model; the same input always gives the same output.
+
+[OK] 1. Machine Learning - Text Classification
+
+======================================================================
+2. NLP - Text Preprocessing
+======================================================================
+Unit checks passed.
+
+raw   : '  Hello,    WORLD!!!  '
+clean : 'hello world'
+
+raw   : "NLP\tis   fun...\nWe're learning   it today."
+clean : 'nlp is fun were learning it today'
+
+raw   : "Email me at test@example.com; it's #1 priority!"
+clean : 'email me at testexamplecom its 1 priority'
+
+raw   : '   already clean sentence   '
+clean : 'already clean sentence'
+
+raw   : 'Numbers like 42 and 3.14 stay, punctuation goes (mostly).'
+clean : 'numbers like 42 and 314 stay punctuation goes mostly'
+
+Why preprocessing helps:
+- Lowercasing stops 'Good' and 'good' being treated as different features.
+- Removing punctuation and extra whitespace reduces noise in the vocabulary.
+- A consistent form makes counts, matching and models behave more predictably.
+- Some tasks need the opposite (e.g. sentiment with '!!!' or named entities in case),
+  so each step is optional and chosen per task.
+
+[OK] 2. NLP - Text Preprocessing
+
+======================================================================
+3. Tokenization
+======================================================================
+Mode: offline fallback (ModuleNotFoundError: pretrained tokenizers unavailable)
+
+Sentence: Unbelievably, the tokenizers don't agree on this sentence!
+1. Tokens:    ['unbelievably', ',', 'the', 'tokenizers', 'don', "'", 't', 'agree', 'on', 'this', 'sentence', '!']
+2. Token IDs: [23, 6, 18, 21, 9, 5, 16, 8, 12, 19, 13, 4]
+3. Decoded:   unbelievably , the tokenizers don ' t agree on this sentence !
+
+Special tokens: {'unk_token': '[UNK]', 'cls_token': '[CLS]', 'sep_token': '[SEP]', 'pad_token': '[PAD]'}
+
+Token counts for two tokenizers:
+  first  (bert/word) : 12 tokens
+  second (character-level) : 58 tokens
+
+Subword tokenization: rare words are split into smaller known pieces
+(BERT marks continuation pieces with '##'), so unseen words can still be represented.
+Special tokens such as [CLS] (start/classification) and [SEP] (separator) mark
+structure for the model; [PAD] fills batches to equal length and [UNK] marks unknowns.
+
+[OK] 3. Tokenization
+
+======================================================================
+4. Embeddings and Semantic Similarity
+======================================================================
+Embedding backend: TF-IDF fallback (ModuleNotFoundError: sentence model unavailable)
+
+Pairwise cosine similarity (embeddings):
+  [semantically similar] score=0.117 (unrelated)
+     A: The cat sat on the mat.
+     B: A kitten is resting on a rug.
+  [unrelated] score=0.000 (unrelated)
+     A: The cat sat on the mat.
+     B: Stock prices fell sharply today.
+  [semantically similar] score=0.110 (unrelated)
+     A: I love reading books at night.
+     B: Reading novels before bed is my favourite hobby.
+  [unrelated] score=0.107 (unrelated)
+     A: I love reading books at night.
+     B: The train to the airport leaves at noon.
+
+Comparison with word counts (CountVectorizer, no meaning captured):
+  [semantically similar] word-count cosine=0.158
+  [unrelated] word-count cosine=0.000
+  [semantically similar] word-count cosine=0.158
+  [unrelated] word-count cosine=0.141
+
+Interpretation:
+- Scores near 1 mean the vectors point the same way; near 0 means little in common.
+- Word counts only reward exact shared words, so 'cat/mat' and 'kitten/rug' score low.
+- Sentence embeddings place sentences with similar meaning close together even with
+  different words. The TF-IDF fallback cannot do this, so run with sentence-transformers
+  installed (see README) to see the full semantic behaviour.
+
+[OK] 4. Embeddings and Semantic Similarity
+
+======================================================================
+5. Semantic Search
+======================================================================
+Embedding backend: TF-IDF fallback (ModuleNotFoundError: sentence model unavailable)
+Stored 10 document embeddings with shape (10, 106) -> /mnt/user-data/outputs/week03_nlp_ml/output/document_embeddings.npy
+
+Query: 'how do I cook pasta'
+  1. (0.113) Boil fresh pasta in salted water for about ten minutes, then drain and serve with sauce.
+  2. (0.000) Hiking trails in the mountains offer scenic views and fresh air.
+  3. (0.000) Neural networks learn patterns from data by adjusting their weights during training.
+
+Query: 'how do plants make food from light'
+  1. (0.091) To make a simple tomato sauce, saute garlic and onions, then add crushed tomatoes.
+  2. (0.090) Neural networks learn patterns from data by adjusting their weights during training.
+  3. (0.000) Hiking trails in the mountains offer scenic views and fresh air.
+
+Query: 'machine learning model training'
+  1. (0.114) Neural networks learn patterns from data by adjusting their weights during training.
+  2. (0.000) Hiking trails in the mountains offer scenic views and fresh air.
+  3. (0.000) To make a simple tomato sauce, saute garlic and onions, then add crushed tomatoes.
+
+Query: 'healthy heart exercise'
+  1. (0.170) Regular exercise improves cardiovascular health and strengthens muscles.
+  2. (0.000) Hiking trails in the mountains offer scenic views and fresh air.
+  3. (0.000) Neural networks learn patterns from data by adjusting their weights during training.
+
+
+[OK] 5. Semantic Search
+
+======================================================================
+Finished
+======================================================================
